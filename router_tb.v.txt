@@ -1,0 +1,85 @@
+`timescale 1ns/1ps
+
+module router_tb;
+
+reg clk;
+reg rst;
+reg valid_in;
+reg [7:0] packet_in;
+
+wire [7:0] out0;
+wire [7:0] out1;
+wire [7:0] out2;
+
+wire valid0;
+wire valid1;
+wire valid2;
+
+mini_router DUT(
+    .clk(clk),
+    .rst(rst),
+    .valid_in(valid_in),
+    .packet_in(packet_in),
+
+    .out0(out0),
+    .out1(out1),
+    .out2(out2),
+
+    .valid0(valid0),
+    .valid1(valid1),
+    .valid2(valid2)
+);
+
+always #5 clk = ~clk;
+
+initial
+begin
+    clk = 0;
+    rst = 1;
+    valid_in = 0;
+    packet_in = 0;
+
+    #20;
+    rst = 0;
+
+    // Packet to Output0
+    #10;
+    valid_in = 1;
+    packet_in = 8'b00_101010;
+
+    // Packet to Output1
+    #10;
+    packet_in = 8'b01_111100;
+
+    // Packet to Output2
+    #10;
+    packet_in = 8'b10_001111;
+
+    // Packet to Output0
+    #10;
+    packet_in = 8'b00_110011;
+
+    #10;
+    valid_in = 0;
+
+    #50;
+    $finish;
+end
+
+initial
+begin
+    $dumpfile("router.vcd");
+    $dumpvars(0,router_tb);
+end
+
+initial
+begin
+    $monitor("Time=%0t Packet=%b | V0=%b Out0=%b | V1=%b Out1=%b | V2=%b Out2=%b",
+             $time,
+             packet_in,
+             valid0,out0,
+             valid1,out1,
+             valid2,out2);
+end
+
+endmodule

@@ -1,0 +1,70 @@
+`timescale 1ns/1ps
+
+module mini_router(
+    input clk,
+    input rst,
+    input valid_in,
+    input [7:0] packet_in,
+
+    output reg [7:0] out0,
+    output reg [7:0] out1,
+    output reg [7:0] out2,
+
+    output reg valid0,
+    output reg valid1,
+    output reg valid2
+);
+
+always @(posedge clk or posedge rst)
+begin
+    if(rst)
+    begin
+        out0 <= 8'd0;
+        out1 <= 8'd0;
+        out2 <= 8'd0;
+
+        valid0 <= 1'b0;
+        valid1 <= 1'b0;
+        valid2 <= 1'b0;
+    end
+    else
+    begin
+        valid0 <= 1'b0;
+        valid1 <= 1'b0;
+        valid2 <= 1'b0;
+
+        if(valid_in)
+        begin
+            case(packet_in[7:6])
+
+                2'b00:
+                begin
+                    out0 <= packet_in;
+                    valid0 <= 1'b1;
+                end
+
+                2'b01:
+                begin
+                    out1 <= packet_in;
+                    valid1 <= 1'b1;
+                end
+
+                2'b10:
+                begin
+                    out2 <= packet_in;
+                    valid2 <= 1'b1;
+                end
+
+                default:
+                begin
+                    valid0 <= 1'b0;
+                    valid1 <= 1'b0;
+                    valid2 <= 1'b0;
+                end
+
+            endcase
+        end
+    end
+end
+
+endmodule
